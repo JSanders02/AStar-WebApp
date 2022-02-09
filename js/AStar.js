@@ -1,10 +1,39 @@
 let globals = {
-    searchDiv: document.getElementById("SearchArea"),
+    searchDiv: document.getElementById("search-area"),
+    clearButton: document.getElementById("clear-map"),
     rowNum: 20,
     colNum: 20,
-    // Use getter as this.colNum does not work usually inside an object literal.
+    // Use a getter as this.colNum does not work directly inside an object literal.
     get boxSize() {
         return 100 / this.colNum;
+    }
+}
+
+function setWall(event) {
+    // Select node that was clicked
+    let currentNode = event.currentTarget;
+
+    currentNode.style.backgroundColor = "black";
+    currentNode.dataset.wall = true;
+}
+
+function clearWall(event) {
+    // Prevent context menu (Default action of event)
+    event.preventDefault();
+    // Select node that was clicked
+    let currentNode = event.currentTarget;
+
+    currentNode.style.backgroundColor = null;
+    currentNode.dataset.wall = false;
+
+    // Return false to prevent context menu showing
+    return false
+}
+
+function clearMap() {
+    for (let node of globals.searchDiv.children) {
+        node.dataset.wall = false;
+        node.style.backgroundColor = null;
     }
 }
 
@@ -15,10 +44,14 @@ function drawGrid() {
             node.classList.add("node");
             node.dataset.x = j;
             node.dataset.y = i;
+            node.dataset.wall = false;
 
             node.style.width = globals.boxSize + "%";
             node.style.height = globals.boxSize + "%";
             node.style.outline = "1px solid black";
+
+            node.addEventListener("click", setWall, false);
+            node.addEventListener("contextmenu", clearWall, false);
 
             globals.searchDiv.appendChild(node);
         }
@@ -26,3 +59,4 @@ function drawGrid() {
 }
 
 window.addEventListener("load", drawGrid, false);
+globals.clearButton.addEventListener("click", clearMap, false);

@@ -19,6 +19,10 @@
     height: 66vw;
 }
 
+#buttons {
+    width: 66vw;
+}
+
 /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 /* ~~~Footer~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 
@@ -26,7 +30,24 @@
 /* ~~~Media Queries~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 @media screen and (min-width: 1000px) {
     #search-area {
-        width: 45vw;
-        height: 45vw;
+
+        width: 40vw;
+        height: 40vw;
+    }
+
+    #buttons {
+        position: absolute;
+        top: 0;
+        width: 20vw;
+        margin: 0 5%;
+    }
+
+    #container {
+        position: relative;
+    }
+
+    button {
+        margin-top: 0;
+        margin-bottom: .5em;
     }
 }

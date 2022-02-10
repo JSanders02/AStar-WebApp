@@ -12,6 +12,8 @@
  const colNum = 20;
  const boxSize = 100 / colNum;
 
+ let map = new Array(rowNum).fill(new Array(colNum).fill(null));
+
 function advanceStage() {
     currentStage++;
 
@@ -21,6 +23,7 @@ function advanceStage() {
     startButton.classList.add("hidden");
 
     for (let node of searchDiv.children) {
+        node.removeEventListener("contextmenu", clearWall);
         node.removeEventListener("click", stages[currentStage-1]);
         node.addEventListener("click", stages[currentStage], false);
     }
@@ -31,7 +34,9 @@ function setWall(event) {
     let currentNode = event.currentTarget;
 
     currentNode.style.backgroundColor = "black";
-    currentNode.dataset.wall = true;
+    map[currentNode.dataset.y][currentNode.dataset.x] = "wall";
+
+    currentNode.dataset.wall = "true";
 }
 
 function clearWall(event) {
@@ -41,7 +46,9 @@ function clearWall(event) {
     let currentNode = event.currentTarget;
 
     currentNode.style.backgroundColor = null;
-    currentNode.dataset.wall = false;
+    map[currentNode.dataset.y][currentNode.dataset.x] = null;
+
+    currentNode.dataset.wall = "false";
 
     // Return false to prevent context menu showing
     return false
@@ -53,7 +60,7 @@ function setFinish(event) {
 
     if (currentNode.dataset.wall !== "true" && currentNode.dataset.start !== "true") {
         currentNode.style.backgroundColor = "red";
-        currentNode.dataset.finish = "true";
+        map[currentNode.dataset.y][currentNode.dataset.x] = "finish";
     }
 }
 
@@ -64,6 +71,7 @@ function setStart(event) {
     if (currentNode.dataset.wall !== "true") {
         currentNode.style.backgroundColor = "green";
         currentNode.dataset.start = "true";
+        map[currentNode.dataset.y][currentNode.dataset.x] = "start";
         advanceStage();
     }
 }
@@ -71,6 +79,7 @@ function setStart(event) {
 function clearMap() {
     for (let node of searchDiv.children) {
         node.dataset.wall = "false";
+        map[node.dataset.y][node.dataset.x] = null;
         node.style.backgroundColor = null;
     }
 }
@@ -93,6 +102,10 @@ function drawGrid() {
             searchDiv.appendChild(node);
         }
     }
+}
+
+function search() {
+
 }
 
 window.addEventListener("load", drawGrid, false);

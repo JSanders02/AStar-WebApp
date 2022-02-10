@@ -30,7 +30,6 @@
 /* ~~~Media Queries~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 @media screen and (min-width: 1000px) {
     #search-area {
-
         width: 40vw;
         height: 40vw;
     }

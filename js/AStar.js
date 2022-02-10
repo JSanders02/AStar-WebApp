@@ -12,7 +12,11 @@
  const colNum = 20;
  const boxSize = 100 / colNum;
 
- let map = new Array(rowNum).fill(new Array(colNum).fill(null));
+ let map = new Array(rowNum);
+
+ for (let i=0; i<map.length; i++) {
+     map[i] = new Array(colNum);
+ }
 
 function advanceStage() {
     currentStage++;
@@ -32,11 +36,8 @@ function advanceStage() {
 function setWall(event) {
     // Select node that was clicked
     let currentNode = event.currentTarget;
-
     currentNode.style.backgroundColor = "black";
-    map[currentNode.dataset.y][currentNode.dataset.x] = "wall";
-
-    currentNode.dataset.wall = "true";
+    map[currentNode.dataset.y][currentNode.dataset.x] = {wall: true};
 }
 
 function clearWall(event) {
@@ -48,8 +49,6 @@ function clearWall(event) {
     currentNode.style.backgroundColor = null;
     map[currentNode.dataset.y][currentNode.dataset.x] = null;
 
-    currentNode.dataset.wall = "false";
-
     // Return false to prevent context menu showing
     return false
 }
@@ -57,28 +56,30 @@ function clearWall(event) {
 function setFinish(event) {
     // Select node that was clicked
     let currentNode = event.currentTarget;
+    let nodeData = map[currentNode.dataset.y][currentNode.dataset.x];
 
-    if (currentNode.dataset.wall !== "true" && currentNode.dataset.start !== "true") {
+    // If node is empty
+    if (!nodeData) {
         currentNode.style.backgroundColor = "red";
-        map[currentNode.dataset.y][currentNode.dataset.x] = "finish";
+        map[currentNode.dataset.y][currentNode.dataset.x] = {finish: true};
+        console.log(map);
     }
 }
 
 function setStart(event) {
     // Select node that was clicked
     let currentNode = event.currentTarget;
+    let nodeData = map[currentNode.dataset.y][currentNode.dataset.x];
 
-    if (currentNode.dataset.wall !== "true") {
+    if (!nodeData) {
         currentNode.style.backgroundColor = "green";
-        currentNode.dataset.start = "true";
-        map[currentNode.dataset.y][currentNode.dataset.x] = "start";
+        map[currentNode.dataset.y][currentNode.dataset.x] = {start: true};
         advanceStage();
     }
 }
 
 function clearMap() {
     for (let node of searchDiv.children) {
-        node.dataset.wall = "false";
         map[node.dataset.y][node.dataset.x] = null;
         node.style.backgroundColor = null;
     }
@@ -91,7 +92,6 @@ function drawGrid() {
             node.classList.add("node");
             node.dataset.x = j;
             node.dataset.y = i;
-            node.dataset.wall = "false";
 
             node.style.width = boxSize + "%";
             node.style.height = boxSize + "%";
@@ -105,7 +105,15 @@ function drawGrid() {
 }
 
 function search() {
-
+    for (let row of map) {
+        for (let node of row) {
+            if (node === "start") {
+                let startNode = node;
+            } else if (node === "finish") {
+                let finishNode = node;
+            }
+        }
+    }
 }
 
 window.addEventListener("load", drawGrid, false);

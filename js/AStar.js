@@ -62,7 +62,7 @@ function setFinish(event) {
     if (!nodeData) {
         currentNode.style.backgroundColor = "red";
         map[currentNode.dataset.y][currentNode.dataset.x] = {finish: true};
-        console.log(map);
+        search()
     }
 }
 
@@ -104,15 +104,79 @@ function drawGrid() {
     }
 }
 
+ function pythagoras(node, finish) {
+     return Math.sqrt((finish[1] - node[1]) ** 2 + (finish[0] - node[0]) ** 2)
+ }
+
 function search() {
-    for (let row of map) {
-        for (let node of row) {
-            if (node === "start") {
-                let startNode = node;
-            } else if (node === "finish") {
-                let finishNode = node;
+    for (let node of searchDiv.children) {
+        node.removeEventListener("click", stages[currentStage-1]);
+    }
+
+    // COORDS ARE [Y, X]
+    let startCoords;
+    let finishCoords;
+    for (let i=0; i<rowNum; i++) {
+        for (let j=0; j<colNum; j++) {
+            if (map[i][j]) {
+                if (map[i][j].start) {
+                    startCoords = [i, j];
+                } else if (map[i][j].finish) {
+                    finishCoords = [i, j];
+                }
             }
         }
+    }
+
+    let openList = [{parent: null, coords: startCoords, g: 0, f: pythagoras(startCoords, finishCoords)}];
+    let closedList = [];
+    let finished = false;
+
+    while (openList.length > 0) {
+        let currentNode = openList.shift();
+
+        if (currentNode.coords === finishCoords) {
+            break;
+        } else {
+            for (let neighbour of [[1, 0], [1, 1], [0, 1], [-1, 1],
+                                    [-1, 0], [-1, -1], [0, -1], [1, -1]]) {
+                let neighbourCoords = [currentNode.coords[0] + neighbour[0],
+                                         currentNode.coords[1] + neighbour[1]];
+
+                let travelled = currentNode.g + pythagoras(currentNode.coords, neighbourCoords);
+
+                let inOpen;
+                let inClosed;
+                for (let node of openList) {
+                    if (node.coords === neighbourCoords) {
+                        if (node.g > travelled) {
+                            node.parent = currentNode;
+                            node.g = travelled;
+                            node.f = travelled + pythagoras(neighbourCoords, finishCoords);
+                        }
+                        inOpen = true;
+                        break;
+                    }
+                }
+
+                if (!inOpen) {
+                    for (let i=0; i<closedList.length; i++) {
+                        if (closedList[i].coords === neighbourCoords) {
+                            if (closedList[i].g > travelled) {
+                                closedList.splice(i, 1);
+                            } else {
+                                inClosed = true; // AT LINE 13 OF PSEUDOCODE
+                            }
+                            break;
+                        }
+                    }
+                }
+
+                let currentNeighbour = {parent: null, coords: startCoords, g: travelled,
+                                         f: travelled + pythagoras(neighbourCoords, finishCoords)}
+            }
+        }
+        closedList.push(currentNode);
     }
 }
 

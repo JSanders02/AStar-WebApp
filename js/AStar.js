@@ -18,6 +18,15 @@
      map[i] = new Array(colNum);
  }
 
+function colourNode(index, colour) {
+    searchDiv.children[index].style.backgroundColor = colour;
+    searchDiv.children[index].offsetHeight;
+}
+
+function calculateChildNum(coords) {
+    return coords[0] * colNum + coords[1];
+}
+
 function advanceStage() {
     currentStage++;
 
@@ -62,7 +71,10 @@ function setFinish(event) {
     if (!nodeData) {
         currentNode.style.backgroundColor = "red";
         map[currentNode.dataset.y][currentNode.dataset.x] = {finish: true};
-        search()
+
+        // 0 second timeout to ensure that the background colour of node is
+        // set before search starts.
+        window.setTimeout(search, 0);
     }
 }
 
@@ -108,9 +120,25 @@ function drawGrid() {
      return Math.sqrt((finish[1] - node[1]) ** 2 + (finish[0] - node[0]) ** 2)
  }
 
+ function isEqualArray(arr1, arr2) {
+     return arr1[0] === arr2[0] && arr1[1] === arr2[1];
+ }
+
+function sleep(milliseconds) {
+    const date = Date.now();
+    let currentDate = null;
+    do {
+        currentDate = Date.now();
+    } while (currentDate - date < milliseconds);
+}
+
+function invalidCoords(coords) {
+     return coords[0] < 0 || coords[0] >= rowNum || coords[1] < 0 || coords[1] > colNum;
+}
+
 function search() {
     for (let node of searchDiv.children) {
-        node.removeEventListener("click", stages[currentStage-1]);
+        node.removeEventListener("click", stages[currentStage]);
     }
 
     // COORDS ARE [Y, X]
@@ -130,12 +158,12 @@ function search() {
 
     let openList = [{parent: null, coords: startCoords, g: 0, f: pythagoras(startCoords, finishCoords)}];
     let closedList = [];
-    let finished = false;
+    let currentNode;
 
     while (openList.length > 0) {
-        let currentNode = openList.shift();
+        currentNode = openList.shift();
 
-        if (currentNode.coords === finishCoords) {
+        if (isEqualArray(currentNode.coords, finishCoords)) {
             break;
         } else {
             for (let neighbour of [[1, 0], [1, 1], [0, 1], [-1, 1],
@@ -143,13 +171,18 @@ function search() {
                 let neighbourCoords = [currentNode.coords[0] + neighbour[0],
                                          currentNode.coords[1] + neighbour[1]];
 
+                if (invalidCoords(neighbourCoords) || map[neighbourCoords[0]][neighbourCoords[1]] &&
+                        map[neighbourCoords[0]][neighbourCoords[1]].wall) {
+                    continue;
+                }
+
                 let travelled = currentNode.g + pythagoras(currentNode.coords, neighbourCoords);
 
                 let inOpen;
                 let inClosed;
                 for (let node of openList) {
-                    if (node.coords === neighbourCoords) {
-                        if (node.g > travelled) {
+                    if (isEqualArray(node.coords, neighbourCoords)) {
+                        if (node.g >= travelled) {
                             node.parent = currentNode;
                             node.g = travelled;
                             node.f = travelled + pythagoras(neighbourCoords, finishCoords);
@@ -161,24 +194,54 @@ function search() {
 
                 if (!inOpen) {
                     for (let i=0; i<closedList.length; i++) {
-                        if (closedList[i].coords === neighbourCoords) {
-                            if (closedList[i].g > travelled) {
+                        if (isEqualArray(closedList[i].coords, neighbourCoords)) {
+                            if (closedList[i].g >= travelled) {
                                 closedList.splice(i, 1);
                             } else {
-                                inClosed = true; // AT LINE 13 OF PSEUDOCODE
+                                inClosed = true;
                             }
                             break;
                         }
                     }
                 }
 
-                let currentNeighbour = {parent: null, coords: startCoords, g: travelled,
-                                         f: travelled + pythagoras(neighbourCoords, finishCoords)}
+                if (!inOpen && !inClosed) {
+                    if (openList.length === 0) {
+                        openList.push({parent: currentNode, coords: neighbourCoords,
+                            g: travelled, f: travelled + pythagoras(neighbourCoords, finishCoords)});
+                    }
+
+                    let oLength = openList.length;
+                    for (let i=0; i<oLength; i++) {
+                        if (!openList[i] || openList[i].f > travelled + pythagoras(neighbourCoords, finishCoords)) {
+                            openList.splice(i, 0,
+                                {parent: currentNode, coords: neighbourCoords,
+                                        g: travelled, f: travelled + pythagoras(neighbourCoords, finishCoords)});
+                            break;
+                        } else if (i === oLength - 1) {
+                            openList.push({parent: currentNode, coords: neighbourCoords,
+                                g: travelled, f: travelled + pythagoras(neighbourCoords, finishCoords)});
+                            break;
+                        }
+                    }
+                }
+
             }
         }
         closedList.push(currentNode);
     }
+
+    if (isEqualArray(currentNode.coords, finishCoords)) {
+        let parent = currentNode.parent;
+        while (!isEqualArray(parent.coords, finishCoords)) {
+            colourNode(calculateChildNum(parent.coords), "green");
+            console.log(parent.coords);
+            parent = parent.parent;
+        }
+    }
 }
+
+
 
 window.addEventListener("load", drawGrid, false);
 clearButton.addEventListener("click", clearMap, false);

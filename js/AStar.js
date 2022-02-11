@@ -1,22 +1,21 @@
+const searchDiv = document.getElementById("search-area");
+const clearButton = document.getElementById("clear-map");
+const startButton = document.getElementById("start-search");
+const instructions = document.getElementById("instructions");
 
- const searchDiv = document.getElementById("search-area");
- const clearButton = document.getElementById("clear-map");
- const startButton = document.getElementById("start-search");
- const instructions = document.getElementById("instructions");
+const stages = [startModify, setStart, setFinish];
+const text = ["Draw a map", "Select start node", "Select finish node"];
+let currentStage = 0;
 
- const stages = [startModify, setStart, setFinish];
- const text = ["Draw a map", "Select start node", "Select finish node"];
- let currentStage = 0;
+const rowNum = 20;
+const colNum = 20;
+const boxSize = 100 / colNum;
 
- const rowNum = 20;
- const colNum = 20;
- const boxSize = 100 / colNum;
+let map = new Array(rowNum);
 
- let map = new Array(rowNum);
-
- for (let i=0; i<map.length; i++) {
-     map[i] = new Array(colNum);
- }
+for (let i=0; i<map.length; i++) {
+    map[i] = new Array(colNum);
+}
 
 function colourNode(index, colour) {
     searchDiv.children[index].style.backgroundColor = colour;

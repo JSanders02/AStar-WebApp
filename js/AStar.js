@@ -134,8 +134,8 @@ function clearMap() {
 }
 
 function drawGrid() {
-    for (let i=0; i<rowNum; i++) {
-        for (let j=0; j<colNum; j++) {
+    for (let i=0; i<map.length; i++) {
+        for (let j=0; j<map[i].length; j++) {
             let node = document.createElement("div");
             node.classList.add("node");
             node.dataset.x = j;
@@ -165,7 +165,7 @@ function isEqualArray(arr1, arr2) {
 }
 
 function invalidCoords(coords) {
-     return coords[0] < 0 || coords[0] >= rowNum || coords[1] < 0 || coords[1] > colNum;
+     return coords[0] < 0 || coords[0] >= rowNum || coords[1] < 0 || coords[1] >= colNum;
 }
 
 function search() {
@@ -265,9 +265,8 @@ function search() {
 
     if (isEqualArray(currentNode.coords, finishCoords)) {
         let parent = currentNode.parent;
-        while (!isEqualArray(parent.coords, finishCoords)) {
+        while (parent) {
             colourNode(calculateChildNum(parent.coords), "green");
-            console.log(parent.coords);
             parent = parent.parent;
         }
     }

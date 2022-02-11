@@ -4,7 +4,7 @@
  const startButton = document.getElementById("start-search");
  const instructions = document.getElementById("instructions");
 
- const stages = [setWall, setStart, setFinish];
+ const stages = [startModify, setStart, setFinish];
  const text = ["Draw a map", "Select start node", "Select finish node"];
  let currentStage = 0;
 
@@ -36,10 +36,17 @@ function advanceStage() {
     startButton.classList.add("hidden");
 
     for (let node of searchDiv.children) {
-        node.removeEventListener("contextmenu", clearWall);
-        node.removeEventListener("click", stages[currentStage-1]);
-        node.addEventListener("click", stages[currentStage], false);
+        node.removeEventListener("mousedown", stages[currentStage-1]);
+        node.addEventListener("mousedown", stages[currentStage], false);
     }
+}
+
+function clearWall(event) {
+    // Select node that was clicked
+    let currentNode = event.currentTarget;
+
+    currentNode.style.backgroundColor = null;
+    map[currentNode.dataset.y][currentNode.dataset.x] = null;
 }
 
 function setWall(event) {
@@ -49,17 +56,46 @@ function setWall(event) {
     map[currentNode.dataset.y][currentNode.dataset.x] = {wall: true};
 }
 
-function clearWall(event) {
-    // Prevent context menu (Default action of event)
+function startModify(event) {
     event.preventDefault();
-    // Select node that was clicked
-    let currentNode = event.currentTarget;
 
-    currentNode.style.backgroundColor = null;
-    map[currentNode.dataset.y][currentNode.dataset.x] = null;
+    // Set wall if left mouse, clear if right
+    if (event.button === 0) {
+        // Draw wall at start point (mouseover only detects mouse entering element)
+        let currentNode = event.currentTarget;
+        currentNode.style.backgroundColor = "black";
+        map[currentNode.dataset.y][currentNode.dataset.x] = {wall: true};
 
-    // Return false to prevent context menu showing
-    return false
+        for (let node of searchDiv.children) {
+            node.addEventListener("mouseover", setWall, false);
+        }
+    } else if (event.button === 2) {
+        // Clear wall at start point (mouseover only detects mouse entering element)
+        let currentNode = event.currentTarget;
+        currentNode.style.backgroundColor = null;
+        map[currentNode.dataset.y][currentNode.dataset.x] = null;
+
+        for (let node of searchDiv.children) {
+            node.addEventListener("mouseover", clearWall, false);
+        }
+    }
+
+    window.addEventListener("mouseup", stopModify);
+    return false;
+}
+
+function stopModify(event) {
+    if (event.button === 0) {
+        for (let node of searchDiv.children) {
+            node.removeEventListener("mouseover", setWall, false);
+        }
+    } else if (event.button === 2) {
+        for (let node of searchDiv.children) {
+            node.removeEventListener("mouseover", clearWall, false);
+        }
+    }
+
+    window.removeEventListener("mouseup", stopModify);
 }
 
 function setFinish(event) {
@@ -108,28 +144,24 @@ function drawGrid() {
             node.style.width = boxSize + "%";
             node.style.height = boxSize + "%";
 
-            node.addEventListener("click", setWall, false);
-            node.addEventListener("contextmenu", clearWall, false);
+            node.addEventListener("mousedown", startModify, false);
+            // Prevent context menu showing when clearing walls
+            node.addEventListener("contextmenu", function(event) {
+                event.preventDefault();
+                return false;
+            }, false);
 
             searchDiv.appendChild(node);
         }
     }
 }
 
- function pythagoras(node, finish) {
-     return Math.sqrt((finish[1] - node[1]) ** 2 + (finish[0] - node[0]) ** 2)
- }
+function pythagoras(node, finish) {
+    return Math.sqrt((finish[1] - node[1]) ** 2 + (finish[0] - node[0]) ** 2)
+}
 
- function isEqualArray(arr1, arr2) {
-     return arr1[0] === arr2[0] && arr1[1] === arr2[1];
- }
-
-function sleep(milliseconds) {
-    const date = Date.now();
-    let currentDate = null;
-    do {
-        currentDate = Date.now();
-    } while (currentDate - date < milliseconds);
+function isEqualArray(arr1, arr2) {
+    return arr1[0] === arr2[0] && arr1[1] === arr2[1];
 }
 
 function invalidCoords(coords) {
@@ -138,7 +170,7 @@ function invalidCoords(coords) {
 
 function search() {
     for (let node of searchDiv.children) {
-        node.removeEventListener("click", stages[currentStage]);
+        node.removeEventListener("mousedown", stages[currentStage]);
     }
 
     // COORDS ARE [Y, X]

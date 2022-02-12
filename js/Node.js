@@ -41,6 +41,8 @@ class Node {
 
         ctx.beginPath()
 
+        ctx.lineWidth = 2;
+
         // Top
         if (this.walls[0]) {
             ctx.moveTo(this.topLeft[0], this.topLeft[1]);

@@ -51,7 +51,7 @@ function setFinish(event) {
 
 function setStart(event) {
     let startNode = findClickedNode(findMouseOnCanvas(event));
-    startNode.fill = "green";
+    startNode.fill = "#66FF66";
 
     startCoords = startNode.coords;
 
@@ -164,6 +164,9 @@ function search() {
         let parent = currentNode.parent;
         while (parent) {
             parent.fill = "green";
+            if (isEqualArray(parent.coords, startCoords)) {
+                parent.fill = "#66FF66"
+            }
             parent = parent.parent;
         }
 

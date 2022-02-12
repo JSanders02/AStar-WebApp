@@ -2,7 +2,8 @@ const directions = [[1, 0, "EW"], [0, 1, "SN"], [-1, 0, "WE"], [0, -1, "NS"]];
 
 // Clears the canvas and redraws all nodes
 function redrawCanvas() {
-    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+    ctx.fillStyle = "white";
+    ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
     for (let column of map) {
         for (let node of column) {
             node.draw();
@@ -70,7 +71,5 @@ function generateMaze() {
     redrawCanvas();
 
     startButton.addEventListener("click", initAStar, false);
+    screenshotButton.addEventListener("click", savePNG, false);
 }
-
-// Adding event listeners
-generateButton.addEventListener("click", generateMaze, false);

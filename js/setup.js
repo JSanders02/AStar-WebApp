@@ -4,16 +4,65 @@ const ctx = mapCanvas.getContext("2d");
 
 const startButton = document.getElementById("start-search");
 const generateButton = document.getElementById("generate-maze");
+const screenshotButton = document.getElementById("save-png");
+
+const sizeInput = document.getElementById("map-size");
 
 // Constants dictating size of the map
-const rowNum = 20;
-const colNum = 20;
+let rowNum;
+let colNum;
+let map;
 
-// Create map as an empty array, and populate that with empty arrays
-let map = new Array(colNum);
+function initialiseMap() {
+    colNum = rowNum = parseInt(sizeInput.children[1].value);
 
-for (let i=0; i<map.length; i++) {
-    map[i] = new Array(rowNum);
+    if (colNum > 50) {
+        sizeInput.children[2].style.display = "block";
+        return;
+    }
+
+    // Create map as an empty array, and populate that with empty arrays
+    map = new Array(colNum);
+
+    for (let i=0; i<map.length; i++) {
+        map[i] = new Array(rowNum);
+    }
+
+    sizeInput.style.display = "none";
+    generateMaze();
+}
+
+// Save a screenshot of the map as a png
+function savePNG() {
+    const link = document.createElement('a');
+    link.download = 'map_solution.png';
+    link.href = mapCanvas.toDataURL();
+    link.click();
+
+    for (let col of map) {
+        for (let node of col) {
+            if (node.fill === "green") {
+                node.fill = "white";
+            }
+        }
+    }
+
+    redrawCanvas();
+
+    link.download = 'map.png';
+    link.href = mapCanvas.toDataURL();
+    link.click();
+    link.remove();
+
+    for (let col of map) {
+        for (let node of col) {
+            if (node.fill === "white") {
+                node.fill = "green";
+            }
+        }
+    }
+
+    redrawCanvas();
 }
 
 // Functions that can be used by all scripts
@@ -45,3 +94,6 @@ function addCoords(coord1, coord2) {
 function pythagoras(node, finish) {
     return Math.sqrt((finish[1] - node[1]) ** 2 + (finish[0] - node[0]) ** 2)
 }
+
+// Adding event listeners
+generateButton.addEventListener("click", initialiseMap, false);

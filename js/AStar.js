@@ -11,14 +11,18 @@ function initAStar() {
     for (let col of map) {
         for (let node of col) {
             node.parent = null;
+
+            // Clear any previously drawn paths
+            if (node.fill) {
+                node.fill = null;
+            }
         }
     }
-
+    redrawCanvas();
     instructions.innerText = "Select start node";
 
-    generateButton.classList.add("hidden");
-    startButton.classList.add("hidden");
-
+    generateButton.removeEventListener("click", initialiseMap, false);
+    startButton.removeEventListener("click", initAStar, false);
     mapCanvas.addEventListener("click", setStart);
 }
 
@@ -163,9 +167,8 @@ function search() {
     if (isEqualArray(currentNode.coords, finishCoords)) {
         let parent = currentNode.parent;
         while (parent) {
-            parent.fill = "green";
-            if (isEqualArray(parent.coords, startCoords)) {
-                parent.fill = "#66FF66"
+            if (!isEqualArray(parent.coords, startCoords)) {
+                parent.fill = "green";
             }
             parent = parent.parent;
         }
@@ -174,4 +177,7 @@ function search() {
     } else {
         alert("No solution found!");
     }
+
+    startButton.addEventListener("click", initAStar, false);
+    generateButton.addEventListener("click", initialiseMap, false);
 }

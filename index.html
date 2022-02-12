@@ -15,10 +15,17 @@
     <h1>A* Algorithm</h1>
     <h2 id="instructions">Generate a maze for the A* Algorithm to solve</h2>
     <div id="container">
+        <div id="map-size" class="absolute-top">
+            <label for="map-size-input">Desired Side Length of Maze
+                (Max: 50):</label>
+            <input id="map-size-input" type="text" name="Name">
+            <p>Map size too big!</p>
+        </div>
         <canvas id="maze-area"></canvas>
         <div id="buttons">
             <button id="generate-maze">Generate New Maze</button>
             <button id="start-search">Start Search</button>
+            <button id="save-png">Save Maze as .PNG</button>
         </div>
     </div>
 </body>

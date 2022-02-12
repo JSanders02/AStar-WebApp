@@ -142,7 +142,6 @@ function search() {
                 if (openList.length === 0) {
                     openList.push(neighbour);
                 }
-
                 let oLength = openList.length;
                 for (let i=0; i<oLength; i++) {
                     if (!openList[i] || openList[i].f > travelled + pythagoras(neighbourCoords, finishCoords)) {

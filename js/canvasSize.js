@@ -15,13 +15,28 @@ function resetCanvasSize() {
      */
     let canvas = document.getElementById('maze-area');
     let windowWidth = window.innerWidth;
+    let windowHeight = window.innerHeight;
+
+    // https://developer.mozilla.org/en-US/docs/Web/API/Document/querySelectorAll
+    /* Select every element that isn't the canvas (or the navbar, as that
+     shouldn't impact the height of the canvas.
+     */
+    let notCanvas = document.querySelectorAll('body>*:not(#container)');
+    let elementsHeight = 0;
+
+    // Get total height of all elements that aren't the canvas.
+    for (let i=0; i<notCanvas.length; i++) {
+        elementsHeight += notCanvas[i].offsetHeight;
+    }
 
     if (windowWidth < 750) {
         canvas.height = canvas.width = windowWidth * 0.9 + 1;
     } else if (windowWidth < 1000) {
         canvas.height = canvas.width = windowWidth * 0.66 + 1;
+    } else if (windowWidth * 0.45 < (windowHeight - elementsHeight) * 0.9 ){
+        canvas.height = canvas.width = windowWidth * 0.45 + 1;
     } else {
-        canvas.height = canvas.width = windowWidth * 0.40 + 1;
+        canvas.height = canvas.width = (windowHeight - elementsHeight) * 0.9 + 1;
     }
 }
 

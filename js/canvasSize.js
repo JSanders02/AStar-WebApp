@@ -29,6 +29,9 @@ function resetCanvasSize() {
         elementsHeight += notCanvas[i].offsetHeight;
     }
 
+    /* Changes canvas size depending on window size (avoids using CSS as
+      that will change the canvas size during the running of the program.
+     */
     if (windowWidth < 750) {
         canvas.height = canvas.width = windowWidth * 0.9 + 1;
     } else if (windowWidth < 1000) {

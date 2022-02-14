@@ -58,13 +58,14 @@ function generateMaze() {
     for (let column of map) {
         for (let node of column) {
             node.walls = [true,true, true, true];
-            node.draw();
         }
     }
 
     let startCoords = [randInt(0, colNum), randInt(0, rowNum)];
 
     let startNode = map[startCoords[0]][startCoords[1]]
+
+    //startNode.fill = "blue";
 
     pickRandomNeighbour(startNode);
 

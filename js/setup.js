@@ -7,6 +7,7 @@ const generateButton = document.getElementById("generate-maze");
 const screenshotButton = document.getElementById("save-png");
 
 const sizeInput = document.getElementById("map-size");
+const errorText = document.getElementById("error-text");
 
 // Constants dictating size of the map
 let rowNum;
@@ -16,8 +17,9 @@ let map;
 function initialiseMap() {
     colNum = rowNum = parseInt(sizeInput.children[1].value);
 
-    if (colNum > 50) {
-        sizeInput.children[2].style.display = "block";
+    // Map size below 2 will only have 1 node. Not enough for start and finish.
+    if (2 >  colNum) {
+        errorText.innerText = "Map size too small. Must be at least 2.";
         return;
     }
 
@@ -29,7 +31,25 @@ function initialiseMap() {
     }
 
     sizeInput.style.display = "none";
-    generateMaze();
+
+    try {
+        generateMaze();
+    } catch(e) {
+        // In case the map size is such that a recursion error is thrown
+        map = [];
+        redrawCanvas();
+        sizeInput.style.display = null;
+
+        // Inform the user of the error, and how to resolve it
+        errorText.innerText = "An error occurred while generating the map." +
+            " Try again, or try a smaller value for side length.";
+
+        /* Remove event listeners to prevent the user from starting a search
+         in an empty maze (will soft-lock the application).
+         */
+        startButton.removeEventListener("click", initAStar);
+        screenshotButton.removeEventListener("click", savePNG);
+    }
 }
 
 // Save a screenshot of the map as a png

@@ -55,9 +55,6 @@ function initialiseMap() {
 // Save a screenshot of the map as a png
 function savePNG() {
     const link = document.createElement('a');
-    link.download = 'map_solution.png';
-    link.href = mapCanvas.toDataURL();
-    link.click();
 
     for (let col of map) {
         for (let node of col) {
@@ -72,7 +69,6 @@ function savePNG() {
     link.download = 'map.png';
     link.href = mapCanvas.toDataURL();
     link.click();
-    link.remove();
 
     for (let col of map) {
         for (let node of col) {
@@ -83,6 +79,11 @@ function savePNG() {
     }
 
     redrawCanvas();
+
+    link.download = 'map-solution.png';
+    link.href = mapCanvas.toDataURL();
+    link.click();
+    link.remove();
 }
 
 // Functions that can be used by all scripts
